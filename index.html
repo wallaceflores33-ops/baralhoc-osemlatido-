@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baralho Cão Sem Latido — 15 Cartas de Reação por Gatilho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EFE3C8;
+    --paper-2: #E6D7B4;
+    --ink: #241F16;
+    --pine: #28402F;
+    --pine-2: #375440;
+    --clay: #BC5B33;
+    --clay-2: #9C4626;
+    --sage: #97A985;
+    --gold: #D2A34A;
+    --cream-card: #FBF4E4;
+    --shadow: rgba(36, 31, 22, 0.18);
+    --radius: 14px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(151,169,133,0.25), transparent 55%),
+      radial-gradient(ellipse at 90% 15%, rgba(210,163,74,0.16), transparent 50%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Karla', sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events:none;
+    z-index:1;
+  }
+
+  h1,h2,h3{font-family:'Fraunces', serif; color:var(--pine); font-weight:600; letter-spacing:-0.01em;}
+
+  .wrap{max-width:1120px; margin:0 auto; padding:0 24px; position:relative; z-index:2;}
+
+  .eyebrow{
+    font-family:'Caveat', cursive;
+    font-size:1.35rem;
+    color:var(--clay-2);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transform:rotate(-2deg);
+  }
+
+  .paw{width:18px;height:18px;display:inline-block;}
+
+  a{color:inherit;}
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    background:var(--clay);
+    color:#FBF4E4;
+    font-family:'Karla', sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    padding:18px 34px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    box-shadow:0 10px 0 var(--clay-2), 0 18px 30px var(--shadow);
+    transition:transform .15s ease, box-shadow .15s ease;
+    text-decoration:none;
+    position:relative;
+  }
+  .btn:hover{transform:translateY(-3px); box-shadow:0 13px 0 var(--clay-2), 0 22px 34px var(--shadow);}
+  .btn:active{transform:translateY(3px); box-shadow:0 6px 0 var(--clay-2), 0 10px 18px var(--shadow);}
+  .btn:focus-visible{outline:3px solid var(--pine); outline-offset:4px;}
+
+  /* ===== HERO ===== */
+  .hero{
+    padding:96px 0 50px;
+    position:relative;
+    max-width:760px;
+    margin:0 auto;
+    text-align:left;
+  }
+
+  .hero-copy{position:relative; z-index:3;}
+
+  .hero h1{
+    font-size:clamp(2.4rem, 4.2vw, 3.6rem);
+    line-height:1.06;
+    margin:18px 0 20px;
+  }
+  .hero h1 em{color:var(--clay); font-style:italic;}
+
+  .hero .sub{
+    font-size:1.15rem;
+    color:#3d3527;
+    max-width:46ch;
+    margin-bottom:34px;
+  }
+
+  .img-slot{position:relative; overflow:hidden; border-radius:inherit;}
+  .img-slot img{width:100%; height:100%; object-fit:cover; display:block;}
+  .img-slot .img-fallback{
+    display:none; position:absolute; inset:0;
+    align-items:center; justify-content:center;
+    background:var(--paper-2);
+    border-radius:inherit;
+    font-size:2.2rem;
+  }
+
+  .paw-trail{position:absolute; z-index:0; opacity:.5;}
+
+  /* ===== CARROSSEL DE CARTAS ===== */
+  .carousel-section{padding:0 24px 70px;}
+  .carousel{
+    position:relative;
+    max-width:760px;
+    margin:0 auto;
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 26px 54px var(--shadow);
+    border:6px solid var(--cream-card);
+    background:var(--cream-card);
+  }
+  .carousel-track{
+    display:flex;
+    transition:transform .55s cubic-bezier(.2,.8,.2,1);
+  }
+  .carousel-slide{
+    min-width:100%;
+    aspect-ratio:4/3;
+  }
+  .carousel-slide img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .carousel-btn{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:46px; height:46px;
+    border-radius:50%;
+    border:none;
+    background:var(--cream-card);
+    color:var(--pine);
+    font-size:1.6rem;
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow:0 10px 24px rgba(0,0,0,.25);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .carousel-btn:hover{transform:translateY(-50%) scale(1.08); background:var(--gold);}
+  .carousel-btn:focus-visible{outline:3px solid var(--clay); outline-offset:3px;}
+  .carousel-btn.prev{left:16px;}
+  .carousel-btn.next{right:16px;}
+  .carousel-dots{
+    position:absolute;
+    bottom:16px; left:50%;
+    transform:translateX(-50%);
+    display:flex; gap:9px;
+    background:rgba(36,31,22,0.35);
+    padding:8px 12px;
+    border-radius:999px;
+  }
+  .carousel-dots .dot{
+    width:8px; height:8px;
+    border-radius:50%;
+    background:rgba(251,244,228,.5);
+    cursor:pointer;
+    border:none;
+    padding:0;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .carousel-dots .dot.active{background:var(--gold); transform:scale(1.25);}
+
+  @media (max-width:600px){
+    .carousel-slide{aspect-ratio:1/1;}
+    .carousel-btn{width:38px; height:38px; font-size:1.3rem;}
+  }
+
+  /* ===== SECTION GENERIC ===== */
+  section{padding:80px 0; position:relative; z-index:2;}
+
+  .section-head{max-width:640px; margin-bottom:48px;}
+  .section-head h2{font-size:clamp(1.8rem,3vw,2.5rem); margin-top:10px;}
+  .section-head p{color:#4a4232; margin-top:14px; font-size:1.05rem;}
+
+  /* ===== FLIP CARD DEMO ===== */
+  .demo{
+    display:grid;
+    grid-template-columns:0.9fr 1.1fr;
+    gap:56px;
+    align-items:center;
+  }
+
+  .flip-wrap{perspective:1400px;}
+  .flip-card{
+    width:100%; max-width:320px; aspect-ratio:5/7;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform .7s cubic-bezier(.2,.8,.2,1);
+    cursor:pointer;
+  }
+  .flip-card.flipped{transform:rotateY(180deg);}
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 22px 44px var(--shadow);
+    border:2px solid rgba(36,31,22,0.08);
+  }
+  .face img{width:100%; height:100%; object-fit:cover; display:block;}
+  .face.back{
+    transform:rotateY(180deg);
+  }
+  .flip-hint{
+    text-align:center; margin-top:16px; font-family:'Caveat', cursive;
+    color:var(--pine-2); font-size:1.15rem;
+  }
+
+  .trigger-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:14px;
+  }
+  .trigger-chip{
+    background:var(--cream-card);
+    border:1.5px solid rgba(40,64,47,0.14);
+    border-radius:12px;
+    padding:14px 16px;
+    font-size:.95rem;
+    color:var(--pine-2);
+    font-weight:700;
+    transition:transform .2s ease, border-color .2s ease;
+  }
+  .trigger-chip:hover{transform:translateY(-3px) rotate(-1deg); border-color:var(--clay);}
+
+  /* ===== COMO USAR (passos) ===== */
+  .steps-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:24px;
+  }
+  .step-item{position:relative; padding-top:8px;}
+  .step-num{
+    display:flex; align-items:center; justify-content:center;
+    width:44px; height:44px;
+    border-radius:50%;
+    background:var(--clay);
+    color:var(--cream-card);
+    font-family:'Fraunces', serif;
+    font-weight:700; font-size:1.3rem;
+    margin-bottom:16px;
+    box-shadow:0 8px 18px var(--shadow);
+  }
+  .step-item h3{font-size:1.1rem; margin-bottom:8px;}
+  .step-item p{font-size:.92rem; color:#4a4232;}
+  .step-item:not(:last-child)::after{
+    content:"";
+    position:absolute; top:22px; left:100%;
+    width:24px; height:2px;
+    background:repeating-linear-gradient(90deg, var(--sage) 0 6px, transparent 6px 10px);
+  }
+
+  /* ===== PARA QUEM É ===== */
+  .checklist{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+  }
+  .check-item{
+    background:var(--cream-card);
+    border-radius:12px;
+    padding:22px 24px;
+    box-shadow:0 8px 20px var(--shadow);
+    position:relative;
+  }
+  .check-item::before{
+    content:"✓";
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px;
+    background:var(--sage);
+    color:#fff; border-radius:50%;
+    font-size:.85rem; font-weight:700;
+    margin-bottom:12px;
+  }
+  .check-item:nth-child(2){transform:rotate(1deg);}
+  .check-item:nth-child(3){transform:rotate(-1deg);}
+
+  /* ===== BONUS ===== */
+  .bonus-strip{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:22px;
+  }
+  .bonus-card{
+    background:var(--pine);
+    color:var(--paper);
+    border-radius:18px;
+    padding:30px 26px;
+    position:relative;
+    overflow:hidden;
+    transition:transform .25s ease;
+  }
+  .bonus-card:hover{transform:translateY(-6px);}
+  .bonus-card .num{
+    font-family:'Fraunces', serif; font-style:italic;
+    font-size:2.6rem; color:var(--gold); opacity:.9;
+  }
+  .bonus-card h3{color:var(--cream-card); font-size:1.25rem; margin-top:8px;}
+  .bonus-card p{color:rgba(251,244,228,.78); font-size:.92rem; margin-top:10px;}
+  .bonus-card::after{
+    content:"";
+    position:absolute; right:-40px; bottom:-40px;
+    width:140px; height:140px;
+    background:radial-gradient(circle, rgba(210,163,74,0.22), transparent 70%);
+  }
+  .bonus-icon-slot{width:44px; height:44px; position:relative; z-index:1; margin-bottom:12px;}
+  .bonus-icon-slot img{width:100%; height:100%; object-fit:contain; display:block;}
+  .bonus-icon-slot .icon-fallback{
+    display:flex; align-items:center; justify-content:center;
+    width:100%; height:100%; font-size:1.5rem;
+    background:rgba(251,244,228,0.14); border-radius:12px;
+    border:1.5px dashed rgba(251,244,228,0.4);
+  }
+
+  .social-proof{
+    display:flex;
+    align-items:center;
+    gap:44px;
+    background:var(--cream-card);
+    border-radius:24px;
+    padding:40px;
+    box-shadow:0 18px 44px var(--shadow);
+  }
+  .social-photo{
+    width:200px; height:200px;
+    object-fit:cover;
+    border-radius:50%;
+    flex-shrink:0;
+    border:6px solid var(--paper);
+    box-shadow:0 14px 30px var(--shadow);
+  }
+  .quote{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.3rem;
+    color:var(--pine);
+    line-height:1.4;
+    margin-top:10px;
+  }
+  .quote-name{
+    margin-top:14px;
+    font-family:'Karla', sans-serif;
+    font-weight:700;
+    color:var(--clay-2);
+    font-size:.9rem;
+  }
+  @media (max-width:860px){
+    .social-proof{flex-direction:column; text-align:center; padding:32px;}
+  }
+
+  /* ===== GARANTIA ===== */
+  .guarantee{
+    display:flex; align-items:center; gap:44px;
+    background:var(--cream-card);
+    border-radius:24px;
+    padding:48px;
+    box-shadow:0 20px 50px var(--shadow);
+  }
+  .seal{
+    flex-shrink:0;
+    width:150px; height:150px;
+    border-radius:50%;
+    border:3px dashed var(--clay);
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    font-family:'Fraunces', serif;
+    color:var(--clay-2);
+    transform:rotate(-8deg);
+    position:relative;
+  }
+  .seal span{display:block;}
+  .seal .big{font-size:2.6rem; font-weight:700; line-height:1;}
+  .seal .small{font-size:.8rem; font-family:'Karla',sans-serif; font-weight:700; letter-spacing:.05em; text-transform:uppercase;}
+
+  /* ===== OFERTA ===== */
+  .offer{
+    background:var(--pine);
+    border-radius:28px;
+    padding:56px;
+    color:var(--paper);
+    position:relative;
+    overflow:hidden;
+  }
+  .offer::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 85% 20%, rgba(210,163,74,0.25), transparent 55%),
+      radial-gradient(circle at 10% 90%, rgba(151,169,133,0.2), transparent 50%);
+  }
+  .offer-inner{position:relative; z-index:1; display:grid; grid-template-columns:1.2fr 0.8fr; gap:48px; align-items:center;}
+  .offer h2{color:var(--cream-card);}
+  .offer-list{margin-top:24px; display:flex; flex-direction:column; gap:12px;}
+  .offer-list li{list-style:none; display:flex; gap:10px; font-size:1.02rem; color:rgba(251,244,228,.9);}
+  .offer-list li::before{content:"🐾"; flex-shrink:0;}
+
+  .urgency{margin-top:28px;}
+  .urgency-bar{
+    height:10px; border-radius:999px;
+    background:rgba(251,244,228,0.18);
+    overflow:hidden;
+  }
+  .urgency-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--gold), var(--clay));
+    border-radius:999px;
+    transition:width 1.4s cubic-bezier(.2,.8,.2,1);
+  }
+  .urgency-text{
+    margin-top:10px; font-size:.85rem; font-weight:700;
+    color:rgba(251,244,228,.85);
+  }
+
+  .countdown-label{
+    display:block; font-family:'Caveat', cursive; font-size:1.15rem;
+    color:var(--clay-2); margin-bottom:10px;
+  }
+  .countdown{display:flex; gap:10px; justify-content:center; margin-bottom:20px;}
+  .cd-box{
+    background:var(--pine); color:var(--cream-card);
+    border-radius:10px; padding:10px 14px; min-width:56px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .cd-box span{font-family:'Fraunces', serif; font-size:1.5rem; font-weight:700; line-height:1;}
+  .cd-box small{font-size:.62rem; text-transform:uppercase; letter-spacing:.05em; color:rgba(251,244,228,.7); margin-top:2px;}
+
+  .price-card{
+    background:var(--cream-card);
+    color:var(--ink);
+    border-radius:20px;
+    padding:36px 30px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.3);
+  }
+  .price-old{font-size:1.1rem; color:#8a7f66; text-decoration:line-through;}
+  .price-new{font-family:'Fraunces', serif; font-size:3rem; color:var(--clay-2); font-weight:700; margin:6px 0 4px;}
+  .price-note{font-size:.85rem; color:#6b6250; margin-bottom:22px;}
+
+  /* ===== FAQ ===== */
+  .faq-item{
+    border-bottom:1.5px solid rgba(40,64,47,0.18);
+    padding:22px 0;
+  }
+  .faq-q{
+    display:flex; justify-content:space-between; align-items:center;
+    cursor:pointer;
+    font-family:'Fraunces', serif;
+    font-size:1.15rem;
+    color:var(--pine);
+  }
+  .faq-q .plus{transition:transform .3s ease; font-size:1.4rem; color:var(--clay);}
+  .faq-item.open .plus{transform:rotate(45deg);}
+  .faq-a{
+    max-height:0; overflow:hidden;
+    transition:max-height .35s ease, opacity .3s ease, padding .3s ease;
+    opacity:0; color:#4a4232; font-size:.98rem;
+  }
+  .faq-item.open .faq-a{max-height:200px; opacity:1; padding-top:14px;}
+
+  /* ===== FOOTER CTA ===== */
+  .final-cta{text-align:center; padding:90px 0 110px;}
+  .final-cta h2{font-size:clamp(1.8rem,3.4vw,2.6rem); margin-bottom:20px;}
+
+  footer{
+    text-align:center; padding:30px 0 50px;
+    color:#8a7f66; font-size:.85rem;
+  }
+
+  @media (max-width: 860px){
+    .hero{padding-top:64px;}
+    .demo, .offer-inner, .guarantee{grid-template-columns:1fr;}
+    .checklist, .bonus-strip, .trigger-grid, .steps-grid{grid-template-columns:1fr;}
+    .step-item::after{display:none;}
+    .countdown{gap:8px;}
+    .cd-box{min-width:48px; padding:8px 10px;}
+    .guarantee{text-align:center; flex-direction:column;}
+    .offer{padding:32px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap hero">
+  <div class="hero-copy">
+    <span class="eyebrow">🐾 pra quem ama, mas já morreu de vergonha do latido</span>
+    <h1>Aquele latido que envergonha você na frente do vizinho tem <em>fim ainda hoje</em></h1>
+    <p class="sub">Seu cão não late pra te irritar — late porque não sabe lidar com o gatilho. Identifique qual é (campainha, ficar sozinho, barulho da rua), puxe a carta certa e veja ele se acalmar em segundos. Sem grito, sem coleira, sem culpa.</p>
+    <a href="#oferta" class="btn">Quero acalmar meu cão agora →</a>
+  </div>
+</div>
+
+<section class="wrap carousel-section" id="carrossel-cartas">
+  <div class="carousel" id="heroCarousel">
+    <div class="carousel-track" id="carouselTrack">
+      <div class="carousel-slide">
+        <img src="images/carrossel-1.jpg" alt="Duas cartas do baralho lado a lado, mostrando gatilho e técnica">
+      </div>
+      <div class="carousel-slide">
+        <img src="images/carrossel-2.jpg" alt="Mão segurando a carta Campainha Toca com cachorro ao fundo">
+      </div>
+      <div class="carousel-slide">
+        <img src="images/carrossel-3.jpg" alt="Baralho completo espalhado sobre a mesa mostrando todos os gatilhos">
+      </div>
+      <div class="carousel-slide">
+        <img src="images/carrossel-4.jpg" alt="Baralho aberto em leque na mesinha de centro, com cachorro deitado tranquilo no sofá ao fundo">
+      </div>
+    </div>
+    <button class="carousel-btn prev" id="carouselPrev" aria-label="Carta anterior">‹</button>
+    <button class="carousel-btn next" id="carouselNext" aria-label="Próxima carta">›</button>
+    <div class="carousel-dots" id="carouselDots"></div>
+  </div>
+</section>
+
+<section class="wrap" id="entregaveis">
+  <div class="section-head">
+    <span class="eyebrow">o que vem no baralho</span>
+    <h2>15 cartas, uma pra cada motivo do seu cão latir</h2>
+    <p>Ele não late do nada — late porque a campainha assusta, porque sentiu sua falta, porque o barulho da rua incomoda. Cada carta identifica o gatilho e te dá a técnica exata pra acalmar ele na hora, sem gritar e sem punição. Toque na carta abaixo e veja como funciona.</p>
+  </div>
+  <div class="demo">
+    <div>
+      <div class="flip-wrap">
+        <div class="flip-card" id="flipCard" role="button" tabindex="0" aria-label="Virar carta de exemplo">
+          <div class="face front">
+            <img src="images/carta-frente-gatilho.jpg" alt="Carta Gatilho: Campainha Toca">
+          </div>
+          <div class="face back">
+            <img src="images/carta-verso-tecnica.jpg" alt="Carta Técnica: Peça Senta, passo a passo ilustrado">
+          </div>
+        </div>
+      </div>
+      <p class="flip-hint">↳ 1 de 15 cartas</p>
+    </div>
+    <div>
+      <p style="margin:0 0 18px; color:#4a4232; font-weight:700;">As outras situações que seu cão te dá todo dia:</p>
+      <div class="trigger-grid">
+        <div class="trigger-chip">Outro cão passando</div>
+        <div class="trigger-chip">Visita chegando</div>
+        <div class="trigger-chip">Barulho da rua</div>
+        <div class="trigger-chip">Sozinho em casa</div>
+        <div class="trigger-chip">Latido noturno</div>
+        <div class="trigger-chip">+ mais 10 situações</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="como-usar">
+  <div class="section-head">
+    <span class="eyebrow">é simples de usar</span>
+    <h2>Você não precisa treinar nada — só puxar a carta certa</h2>
+  </div>
+  <div class="steps-grid">
+    <div class="step-item">
+      <span class="step-num">1</span>
+      <h3>Identifique o gatilho</h3>
+      <p>Veja o que fez seu cão latir naquele momento.</p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">2</span>
+      <h3>Puxe a carta certa</h3>
+      <p>Encontre a carta daquela situação no baralho.</p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">3</span>
+      <h3>Aplique na hora</h3>
+      <p>Siga o passo a passo do verso, sem gritar.</p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">4</span>
+      <h3>Repita até virar hábito</h3>
+      <p>Em poucos dias o cão já reage sozinho, mais calmo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="para-quem">
+  <div class="section-head">
+    <span class="eyebrow">é pra você se</span>
+    <h2>Você ama seu cão — só queria que o latido desse uma trégua</h2>
+    <p>Reconhece alguma dessas situações?</p>
+  </div>
+  <div class="checklist">
+    <div class="check-item">Já recebeu reclamação ou multa por causa do latido do seu cão</div>
+    <div class="check-item">Mora em apartamento e sente um frio na barriga quando o síndico manda mensagem</div>
+    <div class="check-item">O cão late toda vez que alguém toca a campainha, passa na rua ou fica sozinho</div>
+    <div class="check-item">Já tentou de tudo — bronca, coleira, remédio — e no fundo se sente culpado por gritar com ele</div>
+  </div>
+</section>
+
+<section class="wrap" id="bonus">
+  <div class="section-head">
+    <span class="eyebrow">no seu e-mail, hoje mesmo</span>
+    <h2>Tudo que você recebe ao garantir o seu</h2>
+    <p>4 materiais em PDF, prontos pra imprimir — o baralho resolve o latido na hora, os bônus seguram o resultado no dia a dia.</p>
+  </div>
+  <div class="bonus-strip">
+    <div class="bonus-card">
+      <div class="bonus-icon-slot">
+        <img src="images/icon-baralho.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="icon-fallback">🃏</div>
+      </div>
+      <span class="num">01</span>
+      <h3>Baralho Cão Sem Latido</h3>
+      <p>15 cartas de reação por gatilho — campainha, sozinho em casa, barulho da rua, outro cão passando, visita chegando e mais. Frente com o gatilho, verso com a técnica pronta pra aplicar na hora, sem gritar e sem punição. PDF pra imprimir e recortar.</p>
+    </div>
+    <div class="bonus-card">
+      <div class="bonus-icon-slot">
+        <img src="images/icon-diario.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="icon-fallback">📔</div>
+      </div>
+      <span class="num">02</span>
+      <h3>Bônus — Diário de Latidos</h3>
+      <p>Uma folha de registro simples pra anotar horário e situação toda vez que seu cão latir. Em poucos dias o padrão real aparece — não é achismo — e você enxerga se as cartas estão funcionando.</p>
+    </div>
+    <div class="bonus-card">
+      <div class="bonus-icon-slot">
+        <img src="images/icon-treino.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="icon-fallback">🧘</div>
+      </div>
+      <span class="num">03</span>
+      <h3>Bônus — Treino da Calma</h3>
+      <p>5 exercícios curtos, passo a passo, pra ensinar seu cão a se acalmar sozinho mesmo com estímulo por perto. Efeito que dura — não só uma reação pontual.</p>
+    </div>
+    <div class="bonus-card">
+      <div class="bonus-icon-slot">
+        <img src="images/icon-relogio.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="icon-fallback">⏰</div>
+      </div>
+      <span class="num">04</span>
+      <h3>Bônus — Relógio do Xixi</h3>
+      <p>Método com horário fixo de comida/água + 4 momentos-chave de saída, pra você decidir a hora de ir lá fora — não ele. Acaba com acidente em casa e correria de última hora.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="prova-social">
+  <div class="social-proof">
+    <div class="social-photo img-slot">
+      <img src="images/tutor-com-cao.jpg" alt="Tutora sorrindo abraçada com o cão, calmo e deitado no colo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="img-fallback">🐶</div>
+    </div>
+    <div class="social-text">
+      <span class="eyebrow">quem já testou</span>
+      <p class="quote">"No segundo dia eu já sabia exatamente o que fazer quando a campainha tocava. Meu vizinho nem percebeu mais que eu tenho cachorro."</p>
+      <p class="quote-name">— tutora de um vira-lata caramelo, apto pequeno</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="guarantee">
+    <div class="seal">
+      <span class="big">30</span>
+      <span class="small">dias de garantia</span>
+    </div>
+    <div>
+      <h2>Teste sem risco</h2>
+      <p style="margin-top:12px; color:#4a4232;">Você tem 30 dias pra testar as cartas com seu cão. Se aplicar as técnicas e não notar o latido diminuir, devolvemos 100% do seu dinheiro — sem perguntas.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="oferta">
+  <div class="offer">
+    <div class="offer-inner">
+      <div>
+        <span class="eyebrow" style="color:var(--gold);">tudo que você leva hoje</span>
+        <h2>Baralho Cão Sem Latido + 3 bônus</h2>
+        <ul class="offer-list">
+          <li>Baralho com 15 Cartas de Reação por Gatilho</li>
+          <li>Bônus 1 — Diário de Latidos</li>
+          <li>Bônus 2 — Treino da Calma</li>
+          <li>Bônus 3 — Relógio do Xixi</li>
+        </ul>
+        <div class="urgency">
+          <div class="urgency-bar"><div class="urgency-fill"></div></div>
+          <p class="urgency-text">🔥 71% das unidades de hoje já foram resgatadas</p>
+        </div>
+      </div>
+      <div class="price-card">
+        <span class="countdown-label">a oferta expira em</span>
+        <div class="countdown" id="countdown">
+          <div class="cd-box"><span id="cdH">02</span><small>horas</small></div>
+          <div class="cd-box"><span id="cdM">00</span><small>min</small></div>
+          <div class="cd-box"><span id="cdS">00</span><small>seg</small></div>
+        </div>
+        <p class="price-old">De R$87</p>
+        <p class="price-new">R$27,90</p>
+        <p class="price-note">pagamento único · Pix ou cartão em até 12x</p>
+        <a href="#" class="btn" style="width:100%;">Quero meu baralho agora</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="faq">
+  <div class="section-head">
+    <span class="eyebrow">dúvidas</span>
+    <h2>Perguntas frequentes</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q"><span>Funciona pra qualquer porte ou raça de cão?</span><span class="plus">+</span></div>
+      <div class="faq-a">Sim, as técnicas são de comportamento — não dependem de porte ou raça.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span>Preciso de experiência com adestramento?</span><span class="plus">+</span></div>
+      <div class="faq-a">Não, cada carta já traz o passo a passo pronto pra aplicar na hora.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span>Funciona mesmo se o cão já late há anos?</span><span class="plus">+</span></div>
+      <div class="faq-a">Sim. Quanto antes você identifica o gatilho certo, mais rápido vê resultado — mas funciona em casos antigos também.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span>Como recebo o material?</span><span class="plus">+</span></div>
+      <div class="faq-a">PDF de download imediato após a compra, direto no seu e-mail.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q"><span>Tem garantia?</span><span class="plus">+</span></div>
+      <div class="faq-a">Sim, 30 dias.</div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap final-cta">
+  <h2>Ele não precisa aprender a latir menos amor — só a se acalmar mais rápido</h2>
+  <a href="#oferta" class="btn">Quero as 15 cartas agora →</a>
+</div>
+
+<footer class="wrap">
+  Baralho Cão Sem Latido — material digital, entrega imediata por e-mail.
+</footer>
+
+<script>
+  const track = document.getElementById('carouselTrack');
+  const slides = track.children;
+  const dotsWrap = document.getElementById('carouselDots');
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+  let current = 0;
+  let autoplayId;
+
+  for(let i=0;i<slides.length;i++){
+    const dot = document.createElement('button');
+    dot.className = 'dot' + (i===0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Ir pra carta ' + (i+1));
+    dot.addEventListener('click', ()=>{ goTo(i); restartAutoplay(); });
+    dotsWrap.appendChild(dot);
+  }
+  const dots = dotsWrap.children;
+
+  function goTo(index){
+    current = (index + slides.length) % slides.length;
+    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+    for(let i=0;i<dots.length;i++){ dots[i].classList.toggle('active', i===current); }
+  }
+
+  function next(){ goTo(current + 1); }
+  function prev(){ goTo(current - 1); }
+
+  function startAutoplay(){ autoplayId = setInterval(next, 3800); }
+  function restartAutoplay(){ clearInterval(autoplayId); startAutoplay(); }
+
+  nextBtn.addEventListener('click', ()=>{ next(); restartAutoplay(); });
+  prevBtn.addEventListener('click', ()=>{ prev(); restartAutoplay(); });
+
+  const carouselEl = document.getElementById('heroCarousel');
+  carouselEl.addEventListener('mouseenter', ()=> clearInterval(autoplayId));
+  carouselEl.addEventListener('mouseleave', startAutoplay);
+
+  startAutoplay();
+
+  // ===== CRONÔMETRO DE OFERTA =====
+  let secondsLeft = 2*3600; // reinicia em 2h a cada carregamento da página
+  const cdH = document.getElementById('cdH');
+  const cdM = document.getElementById('cdM');
+  const cdS = document.getElementById('cdS');
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function renderCountdown(){
+    const h = Math.floor(secondsLeft/3600);
+    const m = Math.floor((secondsLeft%3600)/60);
+    const s = secondsLeft%60;
+    cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
+  }
+  renderCountdown();
+  setInterval(()=>{
+    secondsLeft = secondsLeft > 0 ? secondsLeft - 1 : 2*3600;
+    renderCountdown();
+  }, 1000);
+
+  // ===== BARRA DE URGÊNCIA =====
+  const urgencyFill = document.querySelector('.urgency-fill');
+  const urgencyIo = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        urgencyFill.style.width = '71%';
+        urgencyIo.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.4});
+  if(urgencyFill) urgencyIo.observe(urgencyFill);
+
+  const card = document.getElementById('flipCard');
+  function toggleFlip(){ card.classList.toggle('flipped'); }
+  card.addEventListener('click', toggleFlip);
+  card.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleFlip(); } });
+
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    item.querySelector('.faq-q').addEventListener('click', ()=>{
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i=>{ if(i!==item) i.classList.remove('open'); });
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+
+  const revealEls = document.querySelectorAll('section, .final-cta');
+  revealEls.forEach(el=>{ el.style.opacity = 0; el.style.transform = 'translateY(24px)'; el.style.transition='opacity .7s ease, transform .7s ease'; });
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.style.opacity = 1;
+        entry.target.style.transform = 'translateY(0)';
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.15});
+  revealEls.forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>
